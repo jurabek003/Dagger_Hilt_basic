@@ -6,11 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+   <androidx.recyclerview.widget.RecyclerView
+       android:id="@+id/rv_adapter"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"/>
+
+    <ProgressBar
+        android:id="@+id/progress_circular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

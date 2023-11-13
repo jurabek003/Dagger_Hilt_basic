@@ -1,4 +1,4 @@
-package uz.turgunboyevjurabek.daggerhiltbasic.di
+package uz.turgunboyevjurabek.daggerhiltbasic.di.module
 
 import dagger.Module
 import dagger.Provides
