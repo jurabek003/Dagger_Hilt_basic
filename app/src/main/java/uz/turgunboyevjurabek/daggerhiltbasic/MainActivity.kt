@@ -6,10 +6,12 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uz.turgunboyevjurabek.daggerhiltbasic.adapter.RvAdapter
 import uz.turgunboyevjurabek.daggerhiltbasic.databinding.ActivityMainBinding
 import uz.turgunboyevjurabek.daggerhiltbasic.utils.Status
@@ -25,31 +27,33 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var rvAdapter: RvAdapter
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
 
-        GlobalScope.launch{
+        lifecycleScope.launch{
+            withContext(Dispatchers.Main){
+                viewModule.getAllClients().observe(this@MainActivity, Observer {
+                    when (it.status) {
+                        Status.LOADING -> {
+                            binding.progressCircular.visibility = View.VISIBLE
+                        }
 
-            viewModule.getAllClients().observe(this@MainActivity, Observer {
-                when (it.status) {
-                    Status.LOADING -> {
-                        binding.progressCircular.visibility = View.VISIBLE
-                    }
+                        Status.SUCCESS -> {
+                                binding.progressCircular.visibility = View.GONE
+                                rvAdapter.upDateData(it.data!!)
+                                binding.rvAdapter.adapter = rvAdapter
+                        }
 
-                    Status.SUCCESS -> {
-                        GlobalScope.launch(Dispatchers.Main) {
-                            binding.progressCircular.visibility = View.GONE
-                            rvAdapter.upDateData(it.data!!)
-                            binding.rvAdapter.adapter = rvAdapter
+                        Status.ERROR -> {
+                           Toast.makeText(this@MainActivity, "${it.massage}", Toast.LENGTH_SHORT).show()
                         }
                     }
-                    
-                    Status.ERROR -> {
-                        Toast.makeText(this@MainActivity, "${it.massage}", Toast.LENGTH_SHORT).show()}
-                }
-            })
+                })
+            }
+
 
         }
     }
